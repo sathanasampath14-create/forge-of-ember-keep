@@ -19,14 +19,14 @@
 
   F.LEVELS = [
     { id: 1, name: 'Apprentice', blurb: 'Plenty of ore, mostly clean. A gentle start.',
-      f: function (x) { return 0.6 * x * x * x - 0.4 * x; }, formula: '0.6x^3 - 0.4x',
+      f: function (x) { return 1.2 * x * x * x - 0.8 * x; }, formula: '1.2x^3 - 0.8x',
       sigma: 0.05, mix: [0.85, 0.15, 0.0], oreCount: 40, seed: 1101 },
     { id: 2, name: 'Journeyman', blurb: 'A wavier shape and much more flawed ore.',
-      f: function (x) { return 0.7 * Math.sin(2.5 * x); }, formula: '0.7 sin(2.5x)',
-      sigma: 0.15, mix: [0.60, 0.40, 0.0], oreCount: 40, seed: 2202 },
+      f: function (x) { return 0.8 * Math.sin(3.5 * x); }, formula: '0.8 sin(3.5x)',
+      sigma: 0.13, mix: [0.60, 0.40, 0.0], oreCount: 40, seed: 2202 },
     { id: 3, name: 'Master', blurb: 'Scarce ore, flawed ore and fake gold. Be careful!',
-      f: function (x) { return 0.5 * Math.sin(3.5 * x) + 0.3 * x; }, formula: '0.5 sin(3.5x) + 0.3x',
-      sigma: 0.2, mix: [0.50, 0.35, 0.15], oreCount: 35, seed: 3303 }
+      f: function (x) { return 0.6 * Math.sin(4 * x) + 0.3 * x; }, formula: '0.6 sin(4x) + 0.3x',
+      sigma: 0.18, mix: [0.50, 0.35, 0.15], oreCount: 35, seed: 3303 }
   ];
 
   var Rules = {};
@@ -84,6 +84,44 @@
     if (N - k < P.minVal) { k = N - P.minVal; msgs.push('You poured almost everything, so a few pieces were kept back in the bucket.'); }
     if (spilled) msgs.unshift('Ore spilled over the edge! ' + spilled + ' pieces were lost.');
     return { train: pts.slice(0, k), val: pts.slice(k), spilled: spilled, msgs: msgs };
+  };
+
+  // ---- Outcome rules (Stage 3 classification). T = training %, V = validation %, G = T - V. Checked in this order. ----
+  Rules.classify = function (T, V) {
+    var O = CONFIG.outcome, G = T - V;
+    if (V >= O.goodV && G <= O.goodGapMax) return 'good';
+    if (T >= O.overT && G > O.goodGapMax && G <= O.mildGapMax) return 'mild';
+    if (T >= O.overT && G > O.mildGapMax) return 'severe';
+    return 'underfit';
+  };
+  Rules.evaluate = function (final) {
+    var O = CONFIG.outcome, kind = Rules.classify(final.T, final.V), G = final.T - final.V, stars = 0, pts = 0, master = 0, combo = 0;
+    if (kind === 'good') { stars = 3; pts = O.goodPoints; }
+    else if (kind === 'mild' || kind === 'severe') { stars = kind === 'mild' ? 2 : 1; pts = Math.max(O.overfitFloor, O.goodPoints - O.overfitSlope * (G - O.goodGapMax)); }
+    if (stars > 0) {
+      combo = Math.max(0, Math.min(CONFIG.hammer.comboMax, final.combo || 0));
+      if (kind === 'good' && final.skippedReforge) master = O.masterBonus;
+    }
+    return { kind: kind, stars: stars, win: stars > 0, G: G, points: stars > 0 ? Math.round(pts + master + combo) : 0, master: master, combo: combo };
+  };
+  // Fresh test ore for each enemy (seed never used for training/validation), noise = pure sigma.
+  Rules.testSets = function (L, seed) {
+    var B = CONFIG.battle, out = [];
+    ['scout', 'armored', 'captain', 'boss'].forEach(function (nm, i) {
+      var rng = F.RNG.create((seed + B.testSeedOffset + i * 101) >>> 0), r = B.ranges[nm], pts = [];
+      for (var k = 0; k < B.testPoints; k++) { var x = rng.range(r[0], r[1]); pts.push({ x: x, y: L.f(x) + L.sigma * rng.normal(), type: 'PURE' }); }
+      out.push({ name: nm, pts: pts });
+    });
+    return out;
+  };
+  // Per-enemy hit quality q = R^2 clamped to [0,1]; durability drops by (1-q)*damageScale; overall war % = accuracy on all test ore.
+  Rules.battle = function (model, L, seed) {
+    var B = CONFIG.battle, dur = B.durability, all = [], sets = Rules.testSets(L, seed);
+    var enemies = sets.map(function (e) {
+      var q = Math.max(0, Math.min(1, F.Reg.r2(model, e.pts))); dur -= (1 - q) * B.damageScale; all = all.concat(e.pts);
+      return { name: e.name, q: q, durability: dur };
+    });
+    return { enemies: enemies, test: F.Reg.accuracy(model, all) };
   };
 
   F.Rules = Rules;

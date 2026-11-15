@@ -19,7 +19,7 @@
             ymax: Math.max(1.0, before.reduce(function (m, p) { return Math.max(m, Math.abs(p.y)); }, 0) * 1.1) };
       this.btn = [
         { x: 100, y: 455, w: 240, h: 50, label: function () { return h.phase === 'running' ? 'STOP (click / Space)' : 'Start'; }, enabled: function () { return h.phase === 'ready' || h.phase === 'running'; }, fn: function () { if (h.phase === 'ready') { h.phase = 'running'; h.t = 0; } else if (h.phase === 'running') stop(); } },
-        { x: 700, y: 455, w: 200, h: 50, label: 'Continue', enabled: function () { return h.phase === 'stopped'; }, fn: function () { F.go('pour'); } }
+        { x: 700, y: 455, w: 200, h: 50, label: 'Continue', enabled: function () { return h.phase === 'stopped'; }, fn: function () { F.note('heat', 'pour'); } }
       ];
     },
     update: function (dt) {
@@ -48,7 +48,7 @@
     keyPressed: function (k, kc) {
       if (h.phase === 'ready' && kc === F.K.ENTER) { h.phase = 'running'; h.t = 0; }
       else if (h.phase === 'running' && kc === F.K.SPACE) stop();
-      else if (h.phase === 'stopped' && kc === F.K.ENTER) F.go('pour');
+      else if (h.phase === 'stopped' && kc === F.K.ENTER) F.note('heat', 'pour');
     }
   };
 })();

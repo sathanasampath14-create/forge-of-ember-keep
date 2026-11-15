@@ -79,8 +79,14 @@
     return 1 - ssr / sst;
   }
 
+  function mse(model, points) {
+    if (!points || !points.length) return 0;
+    var s = 0; for (var i = 0; i < points.length; i++) { var e = points[i].y - predict(model, points[i].x); s += e * e; }
+    return s / points.length;
+  }
+
   // "Accuracy %" shown to the player: R^2 as a percentage clamped to [0,100].
   function accuracy(model, points) { return Math.max(0, Math.min(100, 100 * r2(model, points))); }
 
-  F.Reg = { fit: fit, predict: predict, r2: r2, accuracy: accuracy };
+  F.Reg = { fit: fit, predict: predict, r2: r2, mse: mse, accuracy: accuracy };
 })();

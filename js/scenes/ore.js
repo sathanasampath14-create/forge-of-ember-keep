@@ -37,7 +37,7 @@
         pieces.push({ spec: spec, sx: rng.range(O.xMin, O.xMax), spawn: (i + 0.5) * gap + rng.range(-0.2, 0.2) * gap, y: -20, state: 'wait', spin: (i % 2 ? 1 : -1) * (1 + (i * 0.37) % 2), seed: i * 13 + 5 });
       }
       s = { pieces: pieces, t: 0, cartX: 480, caught: [], missed: 0, done: false, note: '', ymax: 1, fx: [], wheel: 0, rng: F.RNG.create(L.seed ^ 0xFEED) };
-      this.btn = [{ x: 380, y: 490, w: 200, h: 40, label: 'Continue', fn: function () { F.go('heat'); } }];
+      this.btn = [{ x: 380, y: 490, w: 200, h: 40, label: 'Continue', fn: function () { F.note('ore', 'heat'); } }];
     },
     update: function (dt) {
       s.fx = s.fx.filter(function (f) { f.life -= dt; f.vy += 500 * dt; f.x += f.vx * dt; f.y += f.vy * dt; return f.life > 0; });
@@ -92,6 +92,6 @@
       }
     },
     mousePressed: function (mx, my) { if (s.done) UI.clickButtons(this.btn, mx, my); },
-    keyPressed: function (k, kc) { if (s.done && kc === F.K.ENTER) F.go('heat'); }
+    keyPressed: function (k, kc) { if (s.done && kc === F.K.ENTER) F.note('ore', 'heat'); }
   };
 })();

@@ -4,6 +4,11 @@ Forge.go = function (name) {
   Forge.current = sc; Forge.sceneName = name;
   if (sc.enter) sc.enter();
 };
+Forge.State.seen = {};
+Forge.note = function (key, next) { // show a Data Science Note once per session, then continue
+  if (Forge.State.seen[key]) { Forge.go(next); return; }
+  Forge.State.seen[key] = true; Forge.noteData = { key: key, next: next }; Forge.go('note');
+};
 Forge.resize = function () { // scale the 960x540 canvas to fit the window (p5 maps mouse coords for CSS scaling)
   var s = Math.max(0.3, Math.min(window.innerWidth / 960, window.innerHeight / 540));
   var cv = document.querySelector('#game-holder canvas');
