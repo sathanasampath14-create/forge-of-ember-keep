@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Forge of Ember Keep</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-holder"></div>
+<noscript>This game needs JavaScript enabled.</noscript>
+<!-- p5.js pinned to 1.9.4 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<!-- Dependency order: logic first, then UI, then scenes, sketch last -->
+<script src="js/rng.js"></script>
+<script src="js/regression.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/state.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/scenes/title.js"></script>
+<script src="js/scenes/levelSelect.js"></script>
+<script src="js/scenes/ore.js"></script>
+<script src="js/scenes/heat.js"></script>
+<script src="js/scenes/pour.js"></script>
+<script src="js/sketch.js"></script>
+</body>
+</html>

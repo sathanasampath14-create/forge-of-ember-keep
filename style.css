@@ -1,0 +1,4 @@
+html, body { margin: 0; height: 100%; background: #120e16; color: #eee; font-family: Verdana, sans-serif; overflow: hidden; }
+#game-holder { display: flex; align-items: center; justify-content: center; width: 100vw; height: 100vh; }
+canvas { display: block; background: #000; }
+noscript { position: absolute; top: 10px; left: 10px; }
