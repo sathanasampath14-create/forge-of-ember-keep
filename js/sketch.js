@@ -17,6 +17,7 @@ Forge.placeholder = function (name) {
       var r = Forge.State.run || { caught: [], cleaned: [], train: [], val: [] };
       UI.bg(); UI.txt('Stage "' + name + '" arrives in the next phase', 480, 120, 28, UI.COL.gold, CENTER);
       UI.txt('Phase 1 check: caught ' + r.caught.length + ', after heating ' + r.cleaned.length + ', sword ore ' + r.train.length + ', bucket ore ' + r.val.length, 480, 200, 18, UI.COL.ink, CENTER);
+      var fz = r.final; if (fz) UI.txt('Your blade: ' + fz.degree + ' strikes, training ' + fz.T.toFixed(0) + '%, validation ' + fz.V.toFixed(0) + '%, gap ' + fz.G.toFixed(0), 480, 240, 18, UI.COL.gold, CENTER);
       UI.drawButtons(btn);
     },
     mousePressed: function (mx, my) { UI.clickButtons(btn, mx, my); }

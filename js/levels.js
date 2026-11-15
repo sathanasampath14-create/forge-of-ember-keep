@@ -5,7 +5,7 @@
 
   var CONFIG = {
     W: 960, H: 540,
-    ore:    { duration: 40, fallSpeed: 230, cartSpeed: 520, cartW: 96, minCaught: 12, xMin: 70, xMax: 890 },
+    ore:    { duration: 22, fallSpeed: 250, cartSpeed: 520, cartW: 96, minCaught: 12, xMin: 70, xMax: 890 },
     heat:   { sweepSeconds: 3.5, greenLo: 0.45, greenHi: 0.60, coldRemoveMax: 0.8, burnMax: 0.6 },
     pour:   { rate: 0.25, spillFraction: 0.10, minTrain: 6, minVal: 5, minTotal: 14, maxFill: 1.25 },
     hammer: { minDegree: 1, maxDegree: 12, period: 1.2, comboMax: 50, comboPerHit: 10 },

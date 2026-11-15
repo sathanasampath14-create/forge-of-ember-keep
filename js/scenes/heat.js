@@ -18,7 +18,7 @@
       h = { phase: 'ready', t: 0, res: null, before: before,
             ymax: Math.max(1.0, before.reduce(function (m, p) { return Math.max(m, Math.abs(p.y)); }, 0) * 1.1) };
       this.btn = [
-        { x: 120, y: 455, w: 200, h: 50, label: 'Start', enabled: function () { return h.phase === 'ready'; }, fn: function () { h.phase = 'running'; h.t = 0; } },
+        { x: 100, y: 455, w: 240, h: 50, label: function () { return h.phase === 'running' ? 'STOP (click / Space)' : 'Start'; }, enabled: function () { return h.phase === 'ready' || h.phase === 'running'; }, fn: function () { if (h.phase === 'ready') { h.phase = 'running'; h.t = 0; } else if (h.phase === 'running') stop(); } },
         { x: 700, y: 455, w: 200, h: 50, label: 'Continue', enabled: function () { return h.phase === 'stopped'; }, fn: function () { F.go('pour'); } }
       ];
     },
@@ -34,7 +34,7 @@
       var ang = -HALF_PI + h.t * TWO_PI; strokeWeight(5); UI.ss(UI.COL.ember); line(CX, CY, CX + Math.cos(ang) * (R - 10), CY + Math.sin(ang) * (R - 10));
       pop();
       UI.txt('GREEN ZONE', CX - 78, CY + R + 22, 14, UI.COL.green);
-      UI.txt(h.phase === 'ready' ? 'Press START, then SPACE to stop the hand in the green zone.' : (h.phase === 'running' ? 'PRESS SPACE NOW!' : 'The hand stopped.'), CX, CY + R + 48, 15, UI.COL.ink, CENTER);
+      UI.txt(h.phase === 'ready' ? 'Press START, then click anywhere or press SPACE to stop the hand in the green zone.' : (h.phase === 'running' ? 'STOP IT IN THE GREEN!' : 'The hand stopped.'), CX, CY + R + 48, 15, UI.COL.ink, CENTER);
       UI.txt('Before heating', 565, 115, 16, UI.COL.dim, CENTER); UI.txt('After heating', 815, 115, 16, UI.COL.dim, CENTER);
       UI.scatter(h.before, 450, 125, 230, 190, { yMax: h.ymax });
       if (h.res) UI.scatter(h.res.kept, 700, 125, 230, 190, { yMax: h.ymax });
@@ -42,9 +42,9 @@
       UI.legend(560, 340);
       if (h.res) UI.wrap(msg(h.res) + '  Ore left: ' + h.res.kept.length + '.', 450, 365, 480, 80, 16, UI.COL.ink);
       UI.drawButtons(this.btn);
-      UI.txt('SPACE = stop the hand   P = pause', 480, 528, 14, UI.COL.dim, CENTER);
+      UI.txt('Click or SPACE = stop the hand   P = pause', 480, 528, 14, UI.COL.dim, CENTER);
     },
-    mousePressed: function (mx, my) { UI.clickButtons(this.btn, mx, my); },
+    mousePressed: function (mx, my) { if (UI.clickButtons(this.btn, mx, my)) return; if (h.phase === 'running') stop(); },
     keyPressed: function (k, kc) {
       if (h.phase === 'ready' && kc === F.K.ENTER) { h.phase = 'running'; h.t = 0; }
       else if (h.phase === 'running' && kc === F.K.SPACE) stop();
